@@ -26,7 +26,7 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 - 再生エンジン: KSPlayer、VLCKit、AVPlayer、LumeEngine
 - LumeEngine FFmpeg: v0.3.0 release の checksum 固定済み `FFmpeg.xcframework.zip` を使用
 - Entitlements: Push、CloudKit、App Group、Widget。未署名 archive は Apple 証明書を要求せず、AltStore が無料 Apple ID で再署名する。
-- Lume Pro の購入判定は変更していない。
+- Lume Pro の購入判定コードは変更していない。上流の公式 `Sideload` 構成は `SIDE_LOAD` を定義し、セルフビルドを全機能有効として扱うため、Multi-View はこのIPAでは利用可能になる設計。App Store の Release 構成では従来どおり StoreKit 購入判定を使用する。
 
 公式 v2.4.0 の公開 sideload IPA を構造比較用にだけ取得し、47,777,296 bytes、SHA-256 `C4F2E4517E1E89B3E46059D3E1234DE5FEF895EA3D45F3B24560555AD82B83A7` を確認しました。これは本タスクの生成成果物としては扱いません。
 
@@ -38,6 +38,8 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 - iCloud: Microsoft Store 版 15.10.39.0 が既存。AltServer 互換性は実機接続時に継続確認する。
 - AltServer 1.8.0: 公式 CDN から取得し導入・起動済み
 - AltServer インストーラー/実行ファイル: Authenticode 署名なし。公式 CDN の取得元と SHA-256 を記録済み。
+- AltServer 自動起動: HKCU Run に設定し読戻し確認済み
+- Firewall: `AltServer (Private)` 受信許可を Private プロファイル限定で作成・読戻し確認済み
 - iPhone USB: 調査時は Apple iPhone デバイスを未検出
 
 詳細な初期調査は作業ディレクトリの `phase-a-inventory.log`、AltServer MSI ログは `altserver-install.log` に保存しています。
@@ -63,14 +65,32 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 | AltServer起動確認済み | 完了 | プロセスと待受ポートを確認 |
 | iPhone接続確認済み | 未完了 | USB Apple デバイス未検出 |
 | Lumeソース取得済み | 完了 | 固定SHAを記録 |
-| GitHub Actionsビルド成功 | 実行待ち | GitHub CLI 認証後に実行 |
-| IPA生成・構造検証成功 | 未完了 | Workflow Artifact 待ち |
-| WindowsへのIPA取得成功 | 未完了 | Workflow Artifact 待ち |
+| GitHub Actionsビルド成功 | 完了 | Run `37921783086`、Xcode 26.6、全step成功 |
+| IPA生成・構造検証成功 | 完了 | 47,808,278 bytes、SHA-256 `66FC5DB54821DF451B2F67A8A6120C5B08B9DC771A6FCCD9F490191C58CB6758` |
+| WindowsへのIPA取得成功 | 完了 | `outputs/Lume-iPhone-unsigned.ipa` を取得・再展開検証 |
 | AltStore Classicで署名成功 | 未完了 | 実機操作待ち |
 | iPhoneにインストール成功 | 未完了 | 実機操作待ち |
 | Lume起動成功 | 未完了 | 実機操作待ち |
 | M3U取り込み成功 | 未完了 | ユーザーの既存M3Uで実機確認待ち |
 | EPG表示成功 | 未完了 | ユーザーの既存XMLTVで実機確認待ち |
 | IPTV再生成功 | 未完了 | 実機確認待ち |
-| 7日更新運用の準備完了 | 進行中 | AltServer自動起動・通信確認が残る |
+| 7日更新運用の準備完了 | 進行中 | 自動起動/Firewallは完了、iPhoneとの通信確認が残る |
 
+## IPA 実体の再検証結果
+
+- GitHub Actions Run: `37921783086`
+- Xcode: 26.6 (build 17F113)
+- SDK/target: `iphoneos`、`arm64-apple-ios18.0`
+- IPA: 47,808,278 bytes
+- SHA-256: `66FC5DB54821DF451B2F67A8A6120C5B08B9DC771A6FCCD9F490191C58CB6758`
+- ZIP展開: 成功
+- App: `Payload/Lume.app`
+- Info.plist: 読込成功
+- Bundle Identifier: `com.bilipp.lume`
+- MinimumOSVersion: 18.0
+- 実行形式: 64-bit Mach-O、CPU type arm64
+- Mach-O platform: 2 (iOS)、iOS Simulator platform 7 は不在
+- Framework: 25個。`LumeEngine.framework`、`VLCKit.framework`、FFmpegKit系frameworkを確認
+- App Extension: `LumeWidgets.appex` 1個
+- `_CodeSignature`: 0個。Apple開発者証明書による署名は残っていない
+- GitHub Actionsログ: `outputs/build.log`、依存解決ログ: `outputs/resolve.log`
