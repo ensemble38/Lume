@@ -1,0 +1,151 @@
+name: Build iPhone IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  LUME_REF: 62cc493e9ce8d890d09b1675968a079c356c409d
+  ENGINE_REF: 7c39cf96ea586d1ee3c0685be0b180e1a4241229
+  RECORDER_REF: 15e704befc1d35d9d6aef07a61214460965614a2
+
+jobs:
+  build-ios:
+    runs-on: macos-26
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+        working-directory: Lume
+
+    steps:
+      - name: Checkout Lume
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.LUME_REF }}
+          path: Lume
+
+      - name: Checkout LumeEngine sibling
+        uses: actions/checkout@v5
+        with:
+          repository: bilipp/LumeEngine
+          ref: ${{ env.ENGINE_REF }}
+          path: LumeEngine
+
+      - name: Checkout LumeRecorder sibling
+        uses: actions/checkout@v5
+        with:
+          repository: bilipp/LumeRecorder
+          ref: ${{ env.RECORDER_REF }}
+          path: LumeRecorder
+
+      - name: Select latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Verify Xcode 26.4 or newer
+        run: |
+          set -euo pipefail
+          xcodebuild -version | tee "$RUNNER_TEMP/xcode-version.txt"
+          version="$(xcodebuild -version | awk '/Xcode/{print $2}')"
+          python3 - "$version" <<'PY'
+          import sys
+          parts = tuple(int(p) for p in sys.argv[1].split('.')[:2])
+          if parts < (26, 4):
+              raise SystemExit(f"Xcode 26.4+ required; runner has {sys.argv[1]}")
+          PY
+
+      - name: Download Metal toolchain
+        run: xcodebuild -downloadComponent MetalToolchain
+
+      - name: Resolve Swift packages
+        run: |
+          set -euo pipefail
+          xcodebuild -resolvePackageDependencies \
+            -project Lume.xcodeproj \
+            -scheme Lume \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/Lume-SPM" \
+            2>&1 | tee "$RUNNER_TEMP/resolve.log"
+
+      - name: Archive unsigned iPhone app
+        run: |
+          set -euo pipefail
+          xcodebuild archive \
+            -project Lume.xcodeproj \
+            -scheme Lume \
+            -configuration Sideload \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Lume-iPhone.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/Lume-DerivedData" \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/Lume-SPM" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            ENABLE_HARDENED_RUNTIME=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            ARCHS=arm64 \
+            2>&1 | tee "$RUNNER_TEMP/build.log"
+
+      - name: Package and validate IPA
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/Lume-iPhone.xcarchive"
+          app="$(find "$archive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          test -n "$app"
+          test -f "$app/Info.plist"
+
+          executable_name="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Info.plist")"
+          bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")"
+          executable="$app/$executable_name"
+          test -f "$executable"
+
+          file "$executable" | tee "$RUNNER_TEMP/executable-file.txt"
+          lipo -archs "$executable" | tee "$RUNNER_TEMP/executable-architectures.txt"
+          lipo -archs "$executable" | tr ' ' '\n' | grep -qx arm64
+          ! lipo -archs "$executable" | grep -Eq 'x86_64|i386'
+          test "$bundle_id" = 'com.bilipp.lume'
+
+          mkdir -p "$RUNNER_TEMP/ipa/Payload" "$RUNNER_TEMP/artifact"
+          ditto "$app" "$RUNNER_TEMP/ipa/Payload/$(basename "$app")"
+          (cd "$RUNNER_TEMP/ipa" && /usr/bin/zip -qry "$RUNNER_TEMP/artifact/Lume-iPhone-unsigned.ipa" Payload)
+          unzip -t "$RUNNER_TEMP/artifact/Lume-iPhone-unsigned.ipa" | tee "$RUNNER_TEMP/unzip-test.txt"
+          unzip -l "$RUNNER_TEMP/artifact/Lume-iPhone-unsigned.ipa" | tee "$RUNNER_TEMP/ipa-contents.txt"
+
+          test "$(stat -f%z "$RUNNER_TEMP/artifact/Lume-iPhone-unsigned.ipa")" -gt 1000000
+          find "$app/Frameworks" -maxdepth 2 -print | sort | tee "$RUNNER_TEMP/frameworks.txt"
+          test -d "$app/Frameworks"
+          test -n "$(find "$app/Frameworks" -mindepth 1 -maxdepth 1 -print -quit)"
+
+          {
+            echo "Lume commit: $LUME_REF"
+            echo "LumeEngine commit: $ENGINE_REF"
+            echo "LumeRecorder commit: $RECORDER_REF"
+            cat "$RUNNER_TEMP/xcode-version.txt"
+            echo "App: $(basename "$app")"
+            echo "Bundle identifier: $bundle_id"
+            echo "Executable: $executable_name"
+            echo "Architectures: $(lipo -archs "$executable")"
+            echo "IPA bytes: $(stat -f%z "$RUNNER_TEMP/artifact/Lume-iPhone-unsigned.ipa")"
+            shasum -a 256 "$RUNNER_TEMP/artifact/Lume-iPhone-unsigned.ipa"
+            echo "Embedded code objects:"
+            find "$app" \( -name '*.framework' -o -name '*.appex' \) -print | sort
+            echo "Dynamic dependencies:"
+            otool -L "$executable"
+          } | tee "$RUNNER_TEMP/artifact/validation-report.txt"
+
+          cp "$RUNNER_TEMP/build.log" "$RUNNER_TEMP/artifact/build.log"
+          cp "$RUNNER_TEMP/resolve.log" "$RUNNER_TEMP/artifact/resolve.log"
+          cp "$RUNNER_TEMP/ipa-contents.txt" "$RUNNER_TEMP/artifact/ipa-contents.txt"
+          cp "$RUNNER_TEMP/frameworks.txt" "$RUNNER_TEMP/artifact/frameworks.txt"
+
+      - name: Upload unsigned IPA and verification logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lume-iPhone-unsigned
+          path: ${{ runner.temp }}/artifact/
+          if-no-files-found: error
+          retention-days: 30
+
