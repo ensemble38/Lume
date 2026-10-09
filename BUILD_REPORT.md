@@ -40,8 +40,10 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 - AltServer 1.8.0: 公式 CDN から取得し導入・起動済み
 - AltServer インストーラー/実行ファイル: Authenticode 署名なし。公式 CDN の取得元と SHA-256 を記録済み。
 - AltServer 自動起動: HKCU Run に設定し読戻し確認済み
-- Firewall: `AltServer (Private)` 受信許可を Private プロファイル限定で作成・読戻し確認済み
-- iPhone USB: 調査時は Apple iPhone デバイスを未検出
+- Firewall: `AltServer (Private)` 受信許可を Private プロファイル限定で作成・読戻し確認済み。使用中のネットワークも Private に変更し、適用を確認済み
+- iPhone USB: `Apple Mobile Device USB Composite Device`、`Apple Mobile Device USB Device`、`Apple iPhone` を検出。3デバイスとも `CM_PROB_NONE`
+- AltServer: Apple Mobile Device/Bonjourサービス再起動後に再起動し、全インターフェースのTCP待受を確認済み
+- iPhoneの信頼・AltStore Classicとの実通信: 実機確認待ち
 
 詳細な初期調査は作業ディレクトリの `phase-a-inventory.log`、AltServer MSI ログは `altserver-install.log` に保存しています。
 
@@ -64,7 +66,7 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 |---|---|---|
 | AltServerインストール済み | 完了 | 1.8.0 の登録を確認 |
 | AltServer起動確認済み | 完了 | プロセスと待受ポートを確認 |
-| iPhone接続確認済み | 未完了 | USB Apple デバイス未検出 |
+| iPhone接続確認済み | 完了 | USB VID_05AC、Apple iPhone、Apple Mobile Deviceを正常検出 |
 | Lumeソース取得済み | 完了 | 固定SHAを記録 |
 | GitHub Actionsビルド成功 | 完了 | 修正版 Run `37926612849`、Xcode 26.6、全step成功 |
 | IPA生成・構造検証成功 | 完了 | 47,807,968 bytes、SHA-256 `6785EC535CCBFEBA3BC0ADD8A0B036EB7B79E24E90A74181EA554615A5B0CD54` |
