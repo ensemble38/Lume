@@ -4,7 +4,8 @@
 
 ## 固定ソース
 
-- Lume: `62cc493e9ce8d890d09b1675968a079c356c409d` (`main`、v2.4.0 後の公式コミット)
+- Lume upstream base: `62cc493e9ce8d890d09b1675968a079c356c409d` (`main`、v2.4.0 後の公式コミット)
+- Lume build commit: `586d2a69f9f93c1fa37345dea73defbdb9119427`（iOS再生開始時の操作UIを非表示にする最小変更を含む）
 - LumeEngine: `7c39cf96ea586d1ee3c0685be0b180e1a4241229`
 - LumeRecorder: `15e704befc1d35d9d6aef07a61214460965614a2` (`v0.1.1`、公式 sideload workflow と同じ互換ピン)
 
@@ -48,7 +49,7 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 
 `.github/workflows/build-ios-ipa.yml` は以下を実行します。
 
-1. 3 リポジトリを固定 SHA で隣接 checkout
+1. Workflow実行コミットのLumeと、固定SHAのLumeEngine/LumeRecorderを隣接 checkout
 2. `macos-26` と latest stable Xcode を使用し、Xcode 26.4 以上を実測検証
 3. Metal Toolchain を導入
 4. Swift Package 依存を解決
@@ -65,8 +66,8 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 | AltServer起動確認済み | 完了 | プロセスと待受ポートを確認 |
 | iPhone接続確認済み | 未完了 | USB Apple デバイス未検出 |
 | Lumeソース取得済み | 完了 | 固定SHAを記録 |
-| GitHub Actionsビルド成功 | 完了 | Run `37921783086`、Xcode 26.6、全step成功 |
-| IPA生成・構造検証成功 | 完了 | 47,808,278 bytes、SHA-256 `66FC5DB54821DF451B2F67A8A6120C5B08B9DC771A6FCCD9F490191C58CB6758` |
+| GitHub Actionsビルド成功 | 完了 | 修正版 Run `37926612849`、Xcode 26.6、全step成功 |
+| IPA生成・構造検証成功 | 完了 | 47,807,968 bytes、SHA-256 `6785EC535CCBFEBA3BC0ADD8A0B036EB7B79E24E90A74181EA554615A5B0CD54` |
 | WindowsへのIPA取得成功 | 完了 | `outputs/Lume-iPhone-unsigned.ipa` を取得・再展開検証 |
 | AltStore Classicで署名成功 | 未完了 | 実機操作待ち |
 | iPhoneにインストール成功 | 未完了 | 実機操作待ち |
@@ -78,11 +79,12 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 
 ## IPA 実体の再検証結果
 
-- GitHub Actions Run: `37921783086`
+- GitHub Actions Run: `37926612849`
+- Lume build commit: `586d2a69f9f93c1fa37345dea73defbdb9119427`
 - Xcode: 26.6 (build 17F113)
 - SDK/target: `iphoneos`、`arm64-apple-ios18.0`
-- IPA: 47,808,278 bytes
-- SHA-256: `66FC5DB54821DF451B2F67A8A6120C5B08B9DC771A6FCCD9F490191C58CB6758`
+- IPA: 47,807,968 bytes
+- SHA-256: `6785EC535CCBFEBA3BC0ADD8A0B036EB7B79E24E90A74181EA554615A5B0CD54`
 - ZIP展開: 成功
 - App: `Payload/Lume.app`
 - Info.plist: 読込成功
@@ -94,3 +96,7 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 - App Extension: `LumeWidgets.appex` 1個
 - `_CodeSignature`: 0個。Apple開発者証明書による署名は残っていない
 - GitHub Actionsログ: `outputs/build.log`、依存解決ログ: `outputs/resolve.log`
+
+## iOSプレーヤー操作UI修正
+
+ユーザー確認で、受信開始後も一時停止・チャンネル切替ボタンが半透明表示のまま残る問題が判明しました。KSPlayer、VLCKit、AVPlayer、LumeEngine の4ホストすべてで、iOSだけ操作UIの初期状態を非表示へ変更しました。画面タップで表示し、再生中は既存の4秒タイマーで再度非表示になります。tvOS/macOS/visionOSの初期表示は変更していません。修正版をRun `37926612849` で再ビルドし、生成物を再検証しました。
