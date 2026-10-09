@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 env:
-  LUME_REF: 62cc493e9ce8d890d09b1675968a079c356c409d
+  LUME_REF: ${{ github.sha }}
   ENGINE_REF: 7c39cf96ea586d1ee3c0685be0b180e1a4241229
   RECORDER_REF: 15e704befc1d35d9d6aef07a61214460965614a2
 
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout Lume
         uses: actions/checkout@v5
         with:
-          ref: ${{ env.LUME_REF }}
+          ref: ${{ github.sha }}
           path: Lume
 
       - name: Checkout LumeEngine sibling
@@ -148,4 +148,3 @@ jobs:
           path: ${{ runner.temp }}/artifact/
           if-no-files-found: error
           retention-days: 30
-
