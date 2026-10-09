@@ -65,7 +65,13 @@ struct AVPlayerEngineView: View {
     /// Set when `coordinator` came from the tvOS Guide preview already playing
     /// `media`; cleared by the first stream it isn't already playing.
     @State var isAdoptedSession = false
-    @State private var isControlsVisible = true
+    // Start iPhone/iPad playback without chrome; a tap reveals it and the
+    // existing four-second timer dismisses it again.
+    #if os(iOS)
+        @State private var isControlsVisible = false
+    #else
+        @State private var isControlsVisible = true
+    #endif
     /// Set once the stream is given up on (initial-load failure with no fallback
     /// left). Swaps the player for the `PlayerErrorIndicator` (Try Again / Back).
     @State private var loadFailed = false
