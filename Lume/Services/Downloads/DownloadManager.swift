@@ -53,7 +53,15 @@ final class DownloadManager: NSObject {
 
     /// Identifier of the shared background session. Stable across launches —
     /// it is how the app reconnects to transfers `nsurlsessiond` is still running.
-    private static let sessionIdentifier = "bilipp.Lume.downloads"
+    // A sideloaded build can coexist with the App Store build on the same
+    // device.  They must not register the same background-session identifier:
+    // on iOS 27 that collision can block `URLSession` construction long enough
+    // for the scene-create watchdog to terminate the sideloaded app at launch.
+    #if SIDE_LOAD
+        private static let sessionIdentifier = "\(Bundle.main.bundleIdentifier ?? "com.bilipp.lume.sideload").downloads"
+    #else
+        private static let sessionIdentifier = "bilipp.Lume.downloads"
+    #endif
 
     override private init() {
         super.init()
