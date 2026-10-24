@@ -8,8 +8,9 @@ permissions:
 
 env:
   LUME_REF: ${{ github.sha }}
-  ENGINE_REF: 7c39cf96ea586d1ee3c0685be0b180e1a4241229
-  RECORDER_REF: 15e704befc1d35d9d6aef07a61214460965614a2
+  # Match the dependency tags pinned by the upstream sideload workflow.
+  ENGINE_REF: f1c0c1f06478b729b7380012d17e40100394e667
+  RECORDER_REF: 8837c1b7acb92c3f5c4951ffaf22bf088ee4344a
 
 jobs:
   build-ios:
