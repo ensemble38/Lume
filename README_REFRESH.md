@@ -27,3 +27,5 @@ AltStore Classic の非アクティブ化はアプリデータをバックアッ
 
 Lume または依存関係を更新するときだけ `.github/workflows/build-ios-ipa.yml` の固定 SHA を互換バージョンへ変更し、GitHub Actions を再実行します。新しい IPA は既存の Bundle Identifier を維持し、AltStore Classic から上書き導入します。上書き前にアプリ内データが保持されることを確認し、削除→再導入は最後の手段にします。
 
+AltServerのApple認証が利用できない期間は、iLoaderで同じ `Lume-iPhone-unsigned.ipa` を期限切れ前に上書き導入して7日署名を更新します。同じBundle Identifierのまま再署名し、Lumeを削除せず上書きすることでアプリデータを維持します。ソースが変わっていなければ、この更新のためにIPAを再ビルドする必要はありません。
+

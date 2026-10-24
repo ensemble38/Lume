@@ -38,6 +38,18 @@
 
 無料 Apple ID では通常、同時に有効化できるサイドロードアプリは 3 個、登録済み App ID は 10 個までで、署名は 7 日で失効します。Lume には Widget 拡張が含まれるため、Lume 本体とは別の App ID を使用します。
 
+## AltServer の Apple 認証が失敗する場合（iLoader）
+
+Windows版AltServerがApple認証エラー `-80046` で停止する場合は、オープンソースのiLoader 2.4.0で同じ未署名IPAを直接署名・導入できます。本作業環境ではiLoaderでApple IDログインとiPhone 16 ProのUSB認識まで確認済みです。
+
+1. iPhoneをUSB接続し、ロックを解除してコンピュータを信頼する。
+2. iLoaderでApple IDへログインし、2ファクタ認証を完了する。パスワードや確認コードを会話・ログへ送らない。
+3. `DEVICES` で対象iPhoneを選択する。
+4. `Import IPA` から `outputs/Lume-iPhone-unsigned.ipa` を選択する。
+5. 完了表示後、iPhoneのホーム画面でLumeを起動する。
+
+iLoaderは第三者製ツールで、今回使用したWindows版実行ファイルにはAuthenticode署名がありません。取得元とSHA-256を確認して使用します。資格情報を保存しない場合は `Save Credentials` をオフにします。
+
 ## IPTV 動作確認
 
 1. Lume で M3U プレイリスト追加画面を開く。

@@ -1,13 +1,13 @@
 # Lume iPhone ビルド・導入レポート
 
-更新日: 2026-10-09 (Asia/Tokyo)
+更新日: 2026-10-25 (Asia/Tokyo)
 
 ## 固定ソース
 
-- Lume upstream base: `62cc493e9ce8d890d09b1675968a079c356c409d` (`main`、v2.4.0 後の公式コミット)
-- Lume build commit: `586d2a69f9f93c1fa37345dea73defbdb9119427`（iOS再生開始時の操作UIを非表示にする最小変更を含む）
-- LumeEngine: `7c39cf96ea586d1ee3c0685be0b180e1a4241229`
-- LumeRecorder: `15e704befc1d35d9d6aef07a61214460965614a2` (`v0.1.1`、公式 sideload workflow と同じ互換ピン)
+- Lume upstream base: `7843f10caaa209fe6f5f762b4ee821d3c733839d`（2026-10-25取得時の公式 `main`、v2.7.0）
+- Lume build commit: `ca4ad08154c03cc5f4ccfc8706f241ad1abc7464`（サイドロード用workflow、iOS操作UI初期非表示、バックグラウンドセッション分離を含む）
+- LumeEngine: `f1c0c1f06478b729b7380012d17e40100394e667` (`v0.4.0`)
+- LumeRecorder: `8837c1b7acb92c3f5c4951ffaf22bf088ee4344a` (`v0.1.1`)
 
 Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プロジェクトが `../LumeRecorder/Kit` もローカル参照するため、公式 LumeRecorder も隣接配置しました。
 
@@ -68,12 +68,12 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 | AltServer起動確認済み | 完了 | プロセスと待受ポートを確認 |
 | iPhone接続確認済み | 完了 | USB VID_05AC、Apple iPhone、Apple Mobile Deviceを正常検出 |
 | Lumeソース取得済み | 完了 | 固定SHAを記録 |
-| GitHub Actionsビルド成功 | 完了 | 修正版 Run `37926612849`、Xcode 26.6、全step成功 |
-| IPA生成・構造検証成功 | 完了 | 47,807,968 bytes、SHA-256 `6785EC535CCBFEBA3BC0ADD8A0B036EB7B79E24E90A74181EA554615A5B0CD54` |
+| GitHub Actionsビルド成功 | 完了 | 最新版 Run `40107808728`、Xcode 26.6、全step成功 |
+| IPA生成・構造検証成功 | 完了 | 48,645,865 bytes、SHA-256 `FF5C9019E9B86361F755C2A4D4B7BA4493DCFCDD20DCA5EAD9AF3D8689289945` |
 | WindowsへのIPA取得成功 | 完了 | `outputs/Lume-iPhone-unsigned.ipa` を取得・再展開検証 |
-| AltStore Classicで署名成功 | 未完了 | 実機操作待ち |
-| iPhoneにインストール成功 | 未完了 | 実機操作待ち |
-| Lume起動成功 | 未完了 | 実機操作待ち |
+| AltStore Classicで署名成功 | 旧ビルドで完了／最新版未実施 | 最新版IPAの実機署名待ち |
+| iPhoneにインストール成功 | 旧ビルドで完了／最新版未実施 | 最新版IPAの上書き導入待ち |
+| Lume起動成功 | 旧ビルドで完了／最新版未実施 | 最新版IPAの起動確認待ち |
 | M3U取り込み成功 | 未完了 | ユーザーの既存M3Uで実機確認待ち |
 | EPG表示成功 | 未完了 | ユーザーの既存XMLTVで実機確認待ち |
 | IPTV再生成功 | 未完了 | 実機確認待ち |
@@ -81,12 +81,15 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 
 ## IPA 実体の再検証結果
 
-- GitHub Actions Run: `37926612849`
-- Lume build commit: `586d2a69f9f93c1fa37345dea73defbdb9119427`
+- GitHub Actions Run: `40107808728`
+- Lume build commit: `ca4ad08154c03cc5f4ccfc8706f241ad1abc7464`
+- Upstream base: `7843f10caaa209fe6f5f762b4ee821d3c733839d`
+- LumeEngine: `f1c0c1f06478b729b7380012d17e40100394e667`
+- LumeRecorder: `8837c1b7acb92c3f5c4951ffaf22bf088ee4344a`
 - Xcode: 26.6 (build 17F113)
-- SDK/target: `iphoneos`、`arm64-apple-ios18.0`
-- IPA: 47,807,968 bytes
-- SHA-256: `6785EC535CCBFEBA3BC0ADD8A0B036EB7B79E24E90A74181EA554615A5B0CD54`
+- SDK/target: `iphoneos26.5`、`arm64-apple-ios18.0`
+- IPA: 48,645,865 bytes
+- SHA-256: `FF5C9019E9B86361F755C2A4D4B7BA4493DCFCDD20DCA5EAD9AF3D8689289945`
 - ZIP展開: 成功
 - App: `Payload/Lume.app`
 - Info.plist: 読込成功
@@ -97,8 +100,20 @@ Lume と LumeEngine は隣接ディレクトリに配置済みです。Lume プ�
 - Framework: 25個。`LumeEngine.framework`、`VLCKit.framework`、FFmpegKit系frameworkを確認
 - App Extension: `LumeWidgets.appex` 1個
 - `_CodeSignature`: 0個。Apple開発者証明書による署名は残っていない
-- GitHub Actionsログ: `outputs/build.log`、依存解決ログ: `outputs/resolve.log`
+- GitHub Actionsログ: `outputs/build.log`、依存解決・検証ログ一式: `outputs/run-40107808728/`
 
 ## iOSプレーヤー操作UI修正
 
-ユーザー確認で、受信開始後も一時停止・チャンネル切替ボタンが半透明表示のまま残る問題が判明しました。KSPlayer、VLCKit、AVPlayer、LumeEngine の4ホストすべてで、iOSだけ操作UIの初期状態を非表示へ変更しました。画面タップで表示し、再生中は既存の4秒タイマーで再度非表示になります。tvOS/macOS/visionOSの初期表示は変更していません。修正版をRun `37926612849` で再ビルドし、生成物を再検証しました。
+ユーザー確認で、受信開始後も一時停止・チャンネル切替ボタンが半透明表示のまま残る問題が判明しました。KSPlayer、VLCKit、AVPlayer、LumeEngine の4ホストすべてで、iOSだけ操作UIの初期状態を非表示へ変更しました。画面タップで表示し、再生中は既存の4秒タイマーで再度非表示になります。tvOS/macOS/visionOSの初期表示は変更していません。この修正を公式最新版へ再適用し、Run `40107808728` で再ビルド・再検証しました。
+
+## iPad AltStore 起動障害（2026-10-22）
+
+- 接続端末: iPad Pro、iPadOS 26.6.1、UDID `00008103-00060D941EE3401E`
+- USB接続、ペアリング、Developer Mode有効を実測確認。
+- AltStore 2.3 のプロビジョニングプロファイル表示期限は 2026-10-26 だが、実行時syslogで `Trust evaluate failure: ... Revocation4`、`AMFI: code signature validation failed`、`Bad executable` を確認。端末再起動やUSB再接続では直らない署名障害と確定。
+- iPad上のAltStoreに埋め込まれたAltServer ID `10466ab0-a5d6-4617-93bd-e1946dfc30af` は、このWindowsのAltServer ID `87822ac0-138d-4a02-8722-4c6455f95d84` と不一致。
+- Windows AltServer 1.8.0 を再起動し、削除せず上書きインストールを試行したが、Apple認証APIが `This action cannot be completed at this time. (-80046)` を返して停止。
+- 公式Windows配布ZIPを2026-10-22に再取得・MSI検査したが、公開版は引き続き 1.8.0。ZIP SHA-256は `E130EAEEA7957BEDCCA99743A799460BD2001E07B177EC49C67E4CDFBAEDA553`。
+- 同日、AltStoreとSideloadlyの双方で2FA後の `-80046` が広範囲に発生しており、端末接続やIPA構造のエラーではなくApple認証経路の現行障害と一致。
+- 削除に備え、AltStoreコンテナのPreferencesと取得可能なLibraryデータを `device-backups/ipad-altstore-20261022/` に退避済み。現時点では削除してもApple認証失敗を解消できないため、AltStore本体は削除していない。
+- 起動診断ログ: `device-diagnostics/ipad/altstore-launch-20261022.log`
