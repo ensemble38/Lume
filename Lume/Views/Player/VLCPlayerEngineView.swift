@@ -68,7 +68,13 @@ struct VLCPlayerEngineView: View {
     var onRemoteAdvance: ((PlayerMediaSwapper.Step) -> Bool)?
 
     @StateObject private var coordinator = VLCPlayerCoordinator()
-    @State private var isControlsVisible = true
+    // Start iPhone/iPad playback without chrome. A tap reveals the controls,
+    // and the existing four-second timer dismisses them again.
+    #if os(iOS)
+        @State private var isControlsVisible = false
+    #else
+        @State private var isControlsVisible = true
+    #endif
     /// Presents the OpenSubtitles browser. Held here rather than in the controls
     /// overlay: the overlay is removed when the controls auto-hide, which would
     /// take a sheet anchored there down with it mid-search.

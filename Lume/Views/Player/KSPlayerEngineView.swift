@@ -112,7 +112,13 @@ struct KSPlayerEngineView: View {
     /// (so the reconnector never engages, and the startup watchdog is already
     /// disarmed). See `handleState`.
     @State var stallWatchdog: Task<Void, Never>?
-    @State var isControlsVisible = true
+    // Start iPhone/iPad playback without chrome. A tap reveals the controls,
+    // and the existing four-second timer dismisses them again.
+    #if os(iOS)
+        @State var isControlsVisible = false
+    #else
+        @State var isControlsVisible = true
+    #endif
     /// Presents the OpenSubtitles browser. Held here rather than in the controls
     /// overlay: the overlay is removed when the controls auto-hide, which would
     /// take a sheet anchored there down with it mid-search.
