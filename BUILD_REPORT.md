@@ -52,4 +52,3 @@ The validation report and complete build/package logs are in
 - Apple Mobile Device Service and Bonjour are running.
 - The IPA is copied to the Windows desktop as `Lume-iPhone-unsigned.ipa`.
 - Device installation and launch verification require the iPhone to be connected and unlocked, followed by the user's Apple ID authentication in AltServer.
-

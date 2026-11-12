@@ -15,4 +15,3 @@ The prepared IPA is on the Windows desktop:
 The IPA contains `LumeWidgets.appex`. A free Apple ID has a limited App ID allowance. If AltServer offers to remove app extensions, removing the widget does not remove Lume's IPTV, M3U, EPG, or playback features.
 
 Direct **Sideload .ipa** installation by AltServer may not add Lume to AltStore Classic's **My Apps** list. That list tracks apps installed through AltStore's `+` button. The installed Lume app itself is still valid, but automatic **Refresh All** tracking requires installing the same IPA through AltStore Classic instead.
-
