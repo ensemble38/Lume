@@ -45,7 +45,13 @@ import SwiftUI
         /// A reconnect waiting on `refreshStreamURL`; cancelled when the player
         /// goes away or the stream changes, so a late answer can't reopen it.
         @State private var urlRefresh: Task<Void, Never>?
-        @State private var isControlsVisible = true
+        // Start iPhone/iPad playback without chrome. A tap reveals the controls,
+        // and the existing four-second timer dismisses them again.
+        #if os(iOS)
+            @State private var isControlsVisible = false
+        #else
+            @State private var isControlsVisible = true
+        #endif
         /// Held here, not in the overlay: the overlay goes away when the
         /// controls auto-hide and would take the sheet with it.
         @State private var isSearchingSubtitles = false
