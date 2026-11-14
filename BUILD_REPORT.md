@@ -3,11 +3,11 @@
 ## Result
 
 - Status: GitHub Actions build and IPA validation succeeded
-- Lume release: 3.1.0 (build 37)
-- Upstream release commit: `b50d0ba5007f1807aae5b633c5687ee5cf9b2ae8`
-- Patched build commit: `cde788ce72fe763c7e56d162a7a6548ad9384300`
-- Branch: `codex/iphone-v3.1.0-controls`
-- Workflow run: <https://github.com/ensemble38/Lume/actions/runs/43214526045>
+- Lume release: 3.2.0 (build 38)
+- Upstream release commit: `be41f66f584595845dc314782fe4cc64d4311c90`
+- Patched build commit: `e253f4d5477e9d811c69d15a41bd593306e1169e`
+- Branch: `codex/iphone-v3.2.0-controls`
+- Workflow run: <https://github.com/ensemble38/Lume/actions/runs/43536033981>
 - Runner: `xcode-27`
 - Xcode: 27.2 (27B52)
 - Configuration: Sideload / Release / iphoneos / arm64
@@ -28,9 +28,9 @@
 
 ## IPA validation
 
-- File: `outputs/Lume-iPhone-unsigned.ipa`
-- Size: 64,823,796 bytes
-- SHA-256: `0FBDBE24598270DB694389928C14771C6CA130D5D3C4A6639BCB716107AF614F`
+- File: `outputs/Lume-v3.2.0-build38-20261114.ipa`
+- Size: 65,115,650 bytes
+- SHA-256: `606E1EBCF1FCD0450AD0A884977EA97FCCEB0655F0423B174A0F663FC7AB632F`
 - ZIP integrity: passed
 - App: `Payload/Lume.app`
 - Bundle identifier: `com.bilipp.lume`
@@ -43,12 +43,13 @@
 - Signing: app intentionally unsigned for AltServer/AltStore re-signing
 
 The validation report and complete build/package logs are in
-`outputs/run-43214526045/` and in the workflow artifact
-`Lume-v3.1.0-iPhone-unsigned`.
+`outputs/run-43536033981/` and in the workflow artifact
+`Lume-v3.2.0-iPhone-unsigned`.
 
 ## Installation status
 
 - AltServer 1.8.1 is installed and running on Windows.
 - Apple Mobile Device Service and Bonjour are running.
-- The IPA is copied to the Windows desktop as `Lume-iPhone-unsigned.ipa`.
-- Device installation and launch verification require the iPhone to be connected and unlocked, followed by the user's Apple ID authentication in AltServer.
+- AltStore Classic 2.3.3 launch was verified on the connected iPhone 16 Pro.
+- The new IPA is copied to the Windows desktop as both `Lume-v3.2.0-build38-20261114.ipa` and `Lume-iPhone-unsigned.ipa`.
+- Installation and launch of this new 3.2.0 build on the iPhone are not yet verified.

@@ -1,8 +1,9 @@
 # Install Lume 3.2.0 from AltServer on Windows
 
-The prepared IPA is on the Windows desktop:
+The prepared IPA is on the Windows desktop. Prefer the versioned name so an
+older build cannot be selected accidentally:
 
-`Lume-iPhone-unsigned.ipa`
+`Lume-v3.2.0-build38-20261114.ipa`
 
 1. Connect the unlocked iPhone to this PC by USB and accept **Trust** if asked.
 2. Leave AltServer running in the Windows notification area.
