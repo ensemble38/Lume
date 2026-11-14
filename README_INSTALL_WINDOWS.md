@@ -1,4 +1,4 @@
-# Install Lume 3.1.0 from AltServer on Windows
+# Install Lume 3.2.0 from AltServer on Windows
 
 The prepared IPA is on the Windows desktop:
 
